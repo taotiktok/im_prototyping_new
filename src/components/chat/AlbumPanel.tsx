@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 type AlbumTab = "all" | "videos" | "photos";
 
 interface AlbumPanelProps {
-  onSendPhotos: (photoSrcs: string[]) => void;
+  onSendPhotos: (photoSrcs: string[], asScratchCard?: boolean) => void;
   onClose: () => void;
 }
 
@@ -22,6 +22,8 @@ export function AlbumPanel({ onSendPhotos, onClose }: AlbumPanelProps) {
   const [activeTab, setActiveTab] = useState<AlbumTab>("all");
   /** Ordered list of selected photo IDs (order = selection order for numbering) */
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  /** Whether to send photos as interactive scratch cards */
+  const [asScratchCard, setAsScratchCard] = useState(false);
 
   const toggleSelect = useCallback((photoId: string) => {
     setSelectedIds((prev) => {
@@ -38,9 +40,9 @@ export function AlbumPanel({ onSendPhotos, onClose }: AlbumPanelProps) {
       .map((id) => GALLERY_PHOTOS.find((p) => p.id === id)?.src)
       .filter(Boolean) as string[];
     if (srcs.length > 0) {
-      onSendPhotos(srcs);
+      onSendPhotos(srcs, asScratchCard);
     }
-  }, [selectedIds, onSendPhotos]);
+  }, [selectedIds, asScratchCard, onSendPhotos]);
 
   const tabs: { key: AlbumTab; label: string }[] = [
     { key: "all", label: "All" },
@@ -361,12 +363,11 @@ export function AlbumPanel({ onSendPhotos, onClose }: AlbumPanelProps) {
           </div>
         </div>
 
-        {/* Send button — Figma: 350×52, absolute at (20, 567) → 20px from left, 20px from bottom */}
+        {/* Bottom actions: scratch card toggle + send button */}
         <AnimatePresence>
           {selectedIds.length > 0 && (
-            <motion.button
-              key="send-btn"
-              onClick={handleSend}
+            <motion.div
+              key="send-area"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
@@ -376,29 +377,79 @@ export function AlbumPanel({ onSendPhotos, onClose }: AlbumPanelProps) {
                 left: 20,
                 bottom: 20,
                 width: 350,
-                height: 52,
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "8px 20px",
-                borderRadius: 999,
-                background: "#FE2C55",
-                border: "none",
-                cursor: "pointer",
+                flexDirection: "column",
+                gap: 10,
                 zIndex: 12,
               }}
             >
-              <span
+              {/* Scratch card toggle */}
+              <button
+                onClick={() => setAsScratchCard((v) => !v)}
                 style={{
-                  fontWeight: 600,
-                  fontSize: 16,
-                  lineHeight: "1.3em",
-                  color: "#FFFFFF",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  width: "100%",
+                  height: 40,
+                  borderRadius: 999,
+                  background: asScratchCard ? "rgba(254,44,85,0.1)" : "rgba(0,0,0,0.05)",
+                  border: asScratchCard ? "1.5px solid #FE2C55" : "1.5px solid transparent",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
                 }}
               >
-                Send ({selectedIds.length})
-              </span>
-            </motion.button>
+                {/* Scratch card mini icon */}
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <rect x="2" y="8" width="14" height="8" rx="1.5" fill={asScratchCard ? "#FE2C55" : "#999"} opacity="0.8" />
+                  <rect x="1" y="6" width="16" height="3" rx="1" fill={asScratchCard ? "#FE2C55" : "#999"} />
+                  <rect x="8" y="6" width="2" height="10" rx="0.3" fill={asScratchCard ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.4)"} />
+                  <path d="M9 7C9 7 7 3 5.5 4C4 5 7.5 7 9 7Z" fill={asScratchCard ? "#FE2C55" : "#999"} opacity="0.6" />
+                  <path d="M9 7C9 7 11 3 12.5 4C14 5 10.5 7 9 7Z" fill={asScratchCard ? "#FE2C55" : "#999"} opacity="0.6" />
+                </svg>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: asScratchCard ? "#FE2C55" : "rgba(0,0,0,0.55)",
+                    transition: "color 0.2s ease",
+                  }}
+                >
+                  {asScratchCard ? "\u5df2\u5f00\u542f\u522e\u522e\u5361\u6a21\u5f0f" : "\u4ee5\u522e\u522e\u5361\u53d1\u9001"}
+                </span>
+              </button>
+
+              {/* Send button */}
+              <button
+                onClick={handleSend}
+                style={{
+                  width: "100%",
+                  height: 52,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "8px 20px",
+                  borderRadius: 999,
+                  background: "#FE2C55",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 600,
+                    fontSize: 16,
+                    lineHeight: "1.3em",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {asScratchCard
+                    ? `\u53d1\u9001\u522e\u522e\u5361 (${selectedIds.length})`
+                    : `Send (${selectedIds.length})`}
+                </span>
+              </button>
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>

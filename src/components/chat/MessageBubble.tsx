@@ -153,23 +153,24 @@ export function MessageBubble({
             onContextMenu={handleContextMenu}
             style={{
               position: "relative",
-              width: 200,
-              height: 200,
-              borderRadius: 12,
+              width: 180,
+              height: 220,
+              borderRadius: 14,
               overflow: "hidden",
               flexShrink: 0,
               userSelect: "none",
               WebkitUserSelect: "none",
               WebkitTouchCallout: "none",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
             } as React.CSSProperties}
           >
             <ScratchCard
               imageSrc={message.media.thumbnail}
-              width={200}
-              height={200}
-              borderRadius={12}
-              revealThreshold={45}
-              brushRadius={24}
+              width={180}
+              height={220}
+              borderRadius={14}
+              revealThreshold={40}
+              brushRadius={22}
               overlayStyle={message.media.scratchOverlayStyle ?? "sparkle"}
               overlayColor={message.media.scratchOverlayColor ?? "#00C8F8"}
             />

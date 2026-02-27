@@ -225,8 +225,8 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
     setShowAlbumPanel(false);
   }, []);
 
-  /** Send selected photos from album panel as image messages */
-  const handleSendPhotos = useCallback((photoSrcs: string[]) => {
+  /** Send selected photos from album panel as image or scratch_card messages */
+  const handleSendPhotos = useCallback((photoSrcs: string[], asScratchCard?: boolean) => {
     const nowMs = Date.now();
     const now = new Date(nowMs);
     const hours = now.getHours();
@@ -234,6 +234,9 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
     const ampm = hours >= 12 ? "PM" : "AM";
     const h12 = hours % 12 || 12;
     const timeStr = `${h12}:${minutes} ${ampm}`;
+
+    // Random scratch card colors for variety
+    const scratchColors = ["#FE2C55", "#00C8F8", "#FF6B35", "#7C3AED", "#10B981"];
 
     setMessages((prev) => {
       const lastMsg = prev[prev.length - 1];
@@ -249,10 +252,17 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
         sender: "me" as const,
         text: "",
         sentAt: nowMs + idx,
-        media: {
-          type: "image" as const,
-          thumbnail: src,
-        },
+        media: asScratchCard
+          ? {
+              type: "scratch_card" as const,
+              thumbnail: src,
+              scratchOverlayColor: scratchColors[idx % scratchColors.length],
+              scratchOverlayStyle: "sparkle" as const,
+            }
+          : {
+              type: "image" as const,
+              thumbnail: src,
+            },
         // Only first photo in batch gets timestamp
         ...(idx === 0 && showTimestamp ? { timestamp: timeStr } : {}),
       }));
