@@ -107,6 +107,9 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
     const h12 = hours % 12 || 12;
     const timeStr = `${h12}:${minutes} ${ampm}`;
 
+    // Detect "secret" keyword — mark the message as a secret (blurred) message
+    const isSecret = text.toLowerCase() === "secret";
+
     setMessages((prev) => {
       const lastMsg = prev[prev.length - 1];
       // Show timestamp only when gap from last message > 1 minute
@@ -119,6 +122,7 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
         text,
         sentAt: nowMs,
         ...(showTimestamp ? { timestamp: timeStr } : {}),
+        ...(isSecret ? { isSecret: true } : {}),
       };
 
       const updated = prev.map((m) =>

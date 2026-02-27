@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChatMessage, BubblePosition } from "@/types/chat";
 
@@ -57,6 +57,7 @@ export function MessageBubble({
   onLongPress,
 }: MessageBubbleProps) {
   const isMe = message.sender === "me";
+  const [secretRevealed, setSecretRevealed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const movedRef = useRef(false);
 
@@ -268,6 +269,107 @@ export function MessageBubble({
             }}
           >
             {message.text}
+          </div>
+        ) : message.isSecret ? (
+          /* ── Secret (blurred) message ── */
+          <div
+            onTouchStart={startPress}
+            onTouchEnd={cancelPress}
+            onTouchMove={handleMove}
+            onMouseDown={startPress}
+            onMouseUp={cancelPress}
+            onMouseLeave={cancelPress}
+            onContextMenu={handleContextMenu}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: isMe ? "flex-end" : "flex-start",
+              cursor: "pointer",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+            } as React.CSSProperties}
+          >
+            {/* "Type to reveal" hint — only shown when still hidden */}
+            {!secretRevealed && (
+              <span
+                style={{
+                  fontSize: 12,
+                  lineHeight: "1.3em",
+                  color: "rgba(0,0,0,0.35)",
+                  marginBottom: 4,
+                  paddingLeft: isMe ? 0 : 4,
+                  paddingRight: isMe ? 4 : 0,
+                }}
+              >
+                Type to reveal
+              </span>
+            )}
+            <div
+              style={{
+                position: "relative",
+                borderRadius: isMe ? getSenderRadius(position) : getReceiverRadius(position),
+                overflow: "hidden",
+              }}
+            >
+              {/* The actual text — blurred until revealed */}
+              <div
+                style={{
+                  padding: "10px 12px",
+                  background: isMe ? "#00A2C9" : "#FFFFFF",
+                  color: isMe ? "#FFFFFF" : "#000000",
+                  fontSize: 16,
+                  lineHeight: "1.3em",
+                  wordBreak: "break-word",
+                  filter: secretRevealed ? "none" : "blur(8px)",
+                  transition: "filter 0.35s ease",
+                }}
+              >
+                {message.text}
+              </div>
+              {/* Mosaic overlay pattern — only when hidden */}
+              {!secretRevealed && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: isMe
+                      ? "repeating-conic-gradient(rgba(0,162,201,0.45) 0% 25%, rgba(0,162,201,0.25) 0% 50%) 0 0 / 6px 6px"
+                      : "repeating-conic-gradient(rgba(180,180,180,0.4) 0% 25%, rgba(220,220,220,0.3) 0% 50%) 0 0 / 6px 6px",
+                    pointerEvents: "none",
+                    transition: "opacity 0.35s ease",
+                  }}
+                />
+              )}
+              {/* Invisible text input overlay — typing anything reveals */}
+              {!secretRevealed && (
+                <input
+                  type="text"
+                  aria-label="Type to reveal secret message"
+                  autoComplete="off"
+                  onFocus={(e) => {
+                    // Reveal on first keystroke, not on focus
+                    const el = e.currentTarget;
+                    const handler = () => {
+                      setSecretRevealed(true);
+                      el.removeEventListener("input", handler);
+                      el.blur();
+                    };
+                    el.addEventListener("input", handler);
+                  }}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                    fontSize: 16,
+                    border: "none",
+                    background: "transparent",
+                  }}
+                />
+              )}
+            </div>
           </div>
         ) : (
           <div

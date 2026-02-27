@@ -40,6 +40,8 @@ export interface ChatMessage {
   timestamp?: string; // shown as centered timestamp label above this message
   isSeen?: boolean;   // "Seen" indicator below sender's message
   reaction?: ReactionEmoji; // emoji reaction shown below the bubble
+  /** Secret message — content is blurred until revealed by typing */
+  isSecret?: boolean;
 }
 
 /** Computed position within a consecutive group from the same sender */
