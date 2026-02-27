@@ -108,7 +108,7 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
     const timeStr = `${h12}:${minutes} ${ampm}`;
 
     // Detect "secret" keyword — mark the message as a secret (blurred) message
-    const isSecret = text.toLowerCase() === "secret";
+    const isSecret = text.toLowerCase().includes("secret");
 
     setMessages((prev) => {
       const lastMsg = prev[prev.length - 1];

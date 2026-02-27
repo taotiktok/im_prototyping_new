@@ -273,13 +273,6 @@ export function MessageBubble({
         ) : message.isSecret ? (
           /* ── Secret (blurred) message ── */
           <div
-            onTouchStart={startPress}
-            onTouchEnd={cancelPress}
-            onTouchMove={handleMove}
-            onMouseDown={startPress}
-            onMouseUp={cancelPress}
-            onMouseLeave={cancelPress}
-            onContextMenu={handleContextMenu}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -289,7 +282,7 @@ export function MessageBubble({
               WebkitUserSelect: "none",
             } as React.CSSProperties}
           >
-            {/* "Type to reveal" hint — only shown when still hidden */}
+            {/* "tap to reveal" hint — only shown when still hidden */}
             {!secretRevealed && (
               <span
                 style={{
@@ -301,10 +294,31 @@ export function MessageBubble({
                   paddingRight: isMe ? 4 : 0,
                 }}
               >
-                Type to reveal
+                tap to reveal
               </span>
             )}
             <div
+              role="button"
+              tabIndex={0}
+              aria-label={secretRevealed ? message.text : "Secret message, tap to reveal"}
+              onClick={() => {
+                if (!secretRevealed) {
+                  setSecretRevealed(true);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (!secretRevealed && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  setSecretRevealed(true);
+                }
+              }}
+              onTouchStart={secretRevealed ? startPress : undefined}
+              onTouchEnd={secretRevealed ? cancelPress : undefined}
+              onTouchMove={secretRevealed ? handleMove : undefined}
+              onMouseDown={secretRevealed ? startPress : undefined}
+              onMouseUp={secretRevealed ? cancelPress : undefined}
+              onMouseLeave={secretRevealed ? cancelPress : undefined}
+              onContextMenu={secretRevealed ? handleContextMenu : undefined}
               style={{
                 position: "relative",
                 borderRadius: isMe ? getSenderRadius(position) : getReceiverRadius(position),
@@ -337,35 +351,6 @@ export function MessageBubble({
                       : "repeating-conic-gradient(rgba(180,180,180,0.4) 0% 25%, rgba(220,220,220,0.3) 0% 50%) 0 0 / 6px 6px",
                     pointerEvents: "none",
                     transition: "opacity 0.35s ease",
-                  }}
-                />
-              )}
-              {/* Invisible text input overlay — typing anything reveals */}
-              {!secretRevealed && (
-                <input
-                  type="text"
-                  aria-label="Type to reveal secret message"
-                  autoComplete="off"
-                  onFocus={(e) => {
-                    // Reveal on first keystroke, not on focus
-                    const el = e.currentTarget;
-                    const handler = () => {
-                      setSecretRevealed(true);
-                      el.removeEventListener("input", handler);
-                      el.blur();
-                    };
-                    el.addEventListener("input", handler);
-                  }}
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    opacity: 0,
-                    cursor: "pointer",
-                    fontSize: 16,
-                    border: "none",
-                    background: "transparent",
                   }}
                 />
               )}
