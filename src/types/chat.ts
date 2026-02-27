@@ -18,13 +18,17 @@ export type ReactionEmoji = (typeof REACTION_EMOJIS)[number];
  * All media types render at 162×216px per Figma spec.
  */
 export interface ChatMedia {
-  type: "shared_post" | "video" | "image";
+  type: "shared_post" | "video" | "image" | "scratch_card";
   /** Thumbnail / cover image URL */
   thumbnail: string;
   /** shared_post only — original post author's avatar */
   authorAvatar?: string;
   /** shared_post only — original post author's username */
   authorName?: string;
+  /** scratch_card only — overlay color theme */
+  scratchOverlayColor?: string;
+  /** scratch_card only — overlay visual style */
+  scratchOverlayStyle?: "sparkle" | "gradient" | "solid";
 }
 
 export interface ChatMessage {

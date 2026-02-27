@@ -3,6 +3,7 @@
 import { useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChatMessage, BubblePosition } from "@/types/chat";
+import { ScratchCard } from "./ScratchCard";
 
 /**
  * Detect if a string consists entirely of emoji characters.
@@ -144,6 +145,33 @@ export function MessageBubble({
               alt="Sticker"
               style={{ width: 140, height: 140, objectFit: "contain", pointerEvents: "none" }}
               draggable={false}
+            />
+          </div>
+        ) : message.media?.type === "scratch_card" ? (
+          /* Scratch card message — interactive scratchable overlay hiding an image */
+          <div
+            onContextMenu={handleContextMenu}
+            style={{
+              position: "relative",
+              width: 200,
+              height: 200,
+              borderRadius: 12,
+              overflow: "hidden",
+              flexShrink: 0,
+              userSelect: "none",
+              WebkitUserSelect: "none",
+              WebkitTouchCallout: "none",
+            } as React.CSSProperties}
+          >
+            <ScratchCard
+              imageSrc={message.media.thumbnail}
+              width={200}
+              height={200}
+              borderRadius={12}
+              revealThreshold={45}
+              brushRadius={24}
+              overlayStyle={message.media.scratchOverlayStyle ?? "sparkle"}
+              overlayColor={message.media.scratchOverlayColor ?? "#00C8F8"}
             />
           </div>
         ) : message.media ? (

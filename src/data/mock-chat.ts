@@ -53,6 +53,7 @@ export function dmItemToContact(item: InboxDMItem): ChatContact {
 /* ── Shared media thumbnail paths ── */
 const THUMB = "/images/media/post-thumbnail.png";
 const POST_AVATAR = "/images/media/post-author-avatar.png";
+const SCRATCH_IMG = "/images/media/scratch-reveal.jpg";
 
 /** Per-contact starter messages keyed by DM item id */
 const contactMessages: Record<string, ChatMessage[]> = {
@@ -66,7 +67,11 @@ const contactMessages: Record<string, ChatMessage[]> = {
     { id: "m6", sender: "them", text: "Count me in plzz. But tickets are gonna sell out fast. We should set up a plan.", media: { type: "shared_post", thumbnail: THUMB, authorName: "TaylorSwift", authorAvatar: POST_AVATAR } },
     { id: "m7", sender: "them", text: "", timestamp: "9:21 PM", media: { type: "shared_post", thumbnail: THUMB, authorName: "TaylorSwift", authorAvatar: POST_AVATAR } },
     { id: "m8", sender: "me",   text: "OMG look at this stage!", timestamp: "9:22 PM", media: { type: "video", thumbnail: THUMB } },
-    { id: "m9", sender: "me",   text: "Hahah, ok!", isSeen: true },
+    { id: "m9", sender: "them", text: "I got you a surprise!!", timestamp: "9:23 PM" },
+    { id: "m10", sender: "them", text: "", media: { type: "scratch_card", thumbnail: SCRATCH_IMG, scratchOverlayColor: "#FE2C55", scratchOverlayStyle: "sparkle" } },
+    { id: "m11", sender: "me",   text: "Omg what is this!!" },
+    { id: "m12", sender: "me",   text: "", media: { type: "scratch_card", thumbnail: SCRATCH_IMG, scratchOverlayColor: "#00C8F8", scratchOverlayStyle: "sparkle" } },
+    { id: "m13", sender: "me",   text: "Hahah, ok!", isSeen: true },
   ]),
 
   /* ── Tommy Tang (dm2) ── */
@@ -78,7 +83,8 @@ const contactMessages: Record<string, ChatMessage[]> = {
     { id: "m5", sender: "me",   text: "", timestamp: "11:30 AM", media: { type: "video", thumbnail: THUMB } },
     { id: "m6", sender: "me",   text: "Here's another one" },
     { id: "m7", sender: "them", text: "", timestamp: "12:15 PM", media: { type: "image", thumbnail: THUMB } },
-    { id: "m8", sender: "them", text: "Look what I got today!", isSeen: false },
+    { id: "m8", sender: "them", text: "Look what I got today!" },
+    { id: "m9", sender: "them", text: "", media: { type: "scratch_card", thumbnail: SCRATCH_IMG, scratchOverlayColor: "#FF6B35", scratchOverlayStyle: "gradient" } },
   ]),
 
   /* ── summer (dm3) ── */
