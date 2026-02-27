@@ -8,6 +8,7 @@ import { ChatInputBar, ChatInputBarHandle } from "./ChatInputBar";
 import { ReactionPicker } from "./ReactionPicker";
 import { EmojiStickerPanel } from "./EmojiStickerPanel";
 import { AlbumPanel } from "./AlbumPanel";
+import { EmojiExplosion, extractEmojis } from "./EmojiExplosion";
 import { useViewportScale } from "@/hooks/useViewportScale";
 import { ChatContact, ChatMessage, BubblePosition, ReactionEmoji } from "@/types/chat";
 
@@ -55,6 +56,7 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
   const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null);
   const [showEmojiPanel, setShowEmojiPanel] = useState(false);
   const [showAlbumPanel, setShowAlbumPanel] = useState(false);
+  const [explosionEmojis, setExplosionEmojis] = useState<string[] | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputBarRef = useRef<ChatInputBarHandle>(null);
@@ -67,6 +69,7 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
     setDeletingMsgId(null);
     setShowEmojiPanel(false);
     setShowAlbumPanel(false);
+    setExplosionEmojis(null);
   }, [initialMessages]);
 
   // Auto-scroll to bottom when messages change
@@ -109,6 +112,12 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
 
     // Detect "secret" keyword — mark the message as a secret (blurred) message
     const isSecret = text.toLowerCase().includes("secret");
+
+    // Detect emoji characters — trigger fullscreen explosion animation
+    const detectedEmojis = extractEmojis(text);
+    if (detectedEmojis.length > 0) {
+      setExplosionEmojis(detectedEmojis);
+    }
 
     setMessages((prev) => {
       const lastMsg = prev[prev.length - 1];
@@ -509,6 +518,16 @@ export function ChatPage({ contact, initialMessages, onBack }: ChatPageProps) {
             />
           )}
         </AnimatePresence>
+
+        {/* ── Emoji explosion animation ── */}
+        {explosionEmojis && (
+          <EmojiExplosion
+            emojis={explosionEmojis}
+            width={DESIGN_WIDTH}
+            height={layout.designHeight}
+            onComplete={() => setExplosionEmojis(null)}
+          />
+        )}
 
       </div>
 
